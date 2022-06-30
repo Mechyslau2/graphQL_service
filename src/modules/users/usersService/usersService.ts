@@ -14,43 +14,27 @@ class UserService extends RESTDataSource {
     this.baseURL = process.env.USERS_URL;
   }
 
-  register(data: UserRegister) {
-    try {
-      return this.post("register", data);
-    } catch ({ message }) {
-      return message;
-    }
+  register(data: UserRegister): Promise<void> {
+    return this.post("register", data);
   }
 
-  login(email: string, password: string) {
-    try {
-      return this.post("login", {
-        email,
-        password,
-      });
-    } catch ({ message }) {
-      return message;
-    }
+  login(email: string, password: string): Promise<void> {
+    return this.post("login", {
+      email,
+      password,
+    });
   }
 
-  getUserById(id: string) {
-    try {
-      return this.get(`${id}`);
-    } catch ({ message }) {
-      return message;
-    }
+  getUserById(id: string): Promise<void> {
+    return this.get(`${id}`);
   }
 
-  protected verifyToken(token: string) {
-    try {
-      return this.post(`verify`, null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch ({ message }) {
-      return message;
-    }
+  protected verifyToken(token: string): Promise<void> {
+    return this.post(`verify`, null, {
+      headers: {
+        Authorization: `Jwt ${token}`,
+      },
+    });
   }
 }
 

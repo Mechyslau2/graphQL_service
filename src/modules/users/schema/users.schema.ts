@@ -15,9 +15,12 @@ const usersSchema = gql`
   }
 
   type Query {
-    login(email: String, password: String): JWT
+    jwt(email: String, password: String): JWT
+    user(id: ID): User
+  }
+
+  type Mutation {
     register(email: String, password: String, firstName: String, lastName: String): User
-    getById(id: ID): User
   }
 `;
 

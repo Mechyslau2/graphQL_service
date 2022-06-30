@@ -1,11 +1,17 @@
 
-export const resolvers = {
+export default  {
   Query: {
-    login: async(_, { email, password }, { dataSources }) => {
+    jwt: async(_, { email, password }, { dataSources }) => {
       const token = await dataSources.userApi.login(email, password);
-       dataSources.userApi.verifyToken(token.jwt);
+      await dataSources.userApi.verifyToken(token.jwt);
+      process.env.AUTH = token.jwt;
       return token;
     },
+    user: (_, { id }, { dataSources }) => {
+      return dataSources.userApi.getUserById(id);
+    },
+  },
+  Mutation: {
     register: (
       _,
       { email, password, firstName, lastName },
@@ -18,8 +24,5 @@ export const resolvers = {
         lastName,
       });
     },
-    getById: (_, { id }, { dataSources }) => {
-      return dataSources.userApi.getUserById(id);
-    },
-  },
+  }
 };

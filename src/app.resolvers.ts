@@ -1,3 +1,6 @@
-import * as users from './modules/users/resolvers/usersResolvers.js';
+import { combineResolvers } from "apollo-resolvers";
 
-export const resolvers = {...users.resolvers};
+import  users from "./modules/users/resolvers/usersResolvers.js";
+import  genres from "./modules/genres/resolvers/genreResolver.js";
+
+export const resolvers = combineResolvers([users, genres]);

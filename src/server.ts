@@ -7,7 +7,7 @@ import { resolvers } from "./app.resolvers.js";
 import { services } from "./microServices.js";
 import "dotenv/config";
 
-const PORT = process.env.PORT || 4001;
+const PORT = process.env.PORT || 4000;
 
 const apolloServer = async (typeDefs, resolvers): Promise<void> => {
   const app = express();
@@ -19,8 +19,8 @@ const apolloServer = async (typeDefs, resolvers): Promise<void> => {
     cache: "bounded",
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     dataSources: () => services,
-    context: ({ req}) => ({
-      AUTH_TOKEN: req.headers.authorization || '',
+    context: ({ req }) => ({
+      AUTH_TOKEN: req.headers.authorization || process.env.AUTH,
     }),
   });
   await server.start();
