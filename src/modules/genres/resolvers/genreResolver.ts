@@ -1,8 +1,18 @@
 export default {
   Mutation: {
-    createGenre: async (_, genre, { dataSources, AUTH_TOKEN }) => {
+    createGenre: (_, genre, { dataSources, AUTH_TOKEN }) => {
       if (!AUTH_TOKEN) return null;
-      return dataSources.genreApi.createGenre(genre, AUTH_TOKEN);
+      return dataSources.genreApi.createGenre(genre);
+    },
+    updateGenre: (_, { genre }, { dataSources, AUTH_TOKEN }) => {
+      if (!AUTH_TOKEN) return null;
+      const { id } = genre;
+
+      return dataSources.genreApi.updateGenre(id, genre);
+    },
+    deleteGenre: (_, { id }, { dataSources, AUTH_TOKEN }) => {
+      if (!AUTH_TOKEN) return null;
+      return dataSources.genreApi.deleteGenre(id);
     },
   },
   Query: {

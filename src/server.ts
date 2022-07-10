@@ -6,6 +6,7 @@ import { typesDefinitions } from "./schema.js";
 import { resolvers } from "./app.resolvers.js";
 import { services } from "./microServices.js";
 import "dotenv/config";
+import Validation from "./utils/validations.js";
 
 const PORT = process.env.PORT || 4000;
 
@@ -19,9 +20,14 @@ const apolloServer = async (typeDefs, resolvers): Promise<void> => {
     cache: "bounded",
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     dataSources: () => services,
-    context: ({ req }) => ({
-      AUTH_TOKEN: req.headers.authorization || process.env.AUTH,
-    }),
+    context: ({ req }) => {
+      const token =
+        (process.env.NODE_ENV.trim() === "dev"
+          ? process.env.AUTH
+          : req.headers.authorization) || "";
+      const isValid =  Validation.isValidToken(token);
+      return { AUTH_TOKEN: isValid ? token : "" };
+    },
   });
   await server.start();
   server.applyMiddleware({ app });

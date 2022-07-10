@@ -1,4 +1,5 @@
 import { RESTDataSource } from "apollo-datasource-rest";
+import { transformObject } from '../../../utils/sortUtils.js';
 import "dotenv/config";
 
 interface UserRegister {
@@ -6,6 +7,10 @@ interface UserRegister {
   lastName: string;
   password: string;
   email: string;
+}
+
+interface User extends UserRegister {
+  _id: string;
 }
 
 class UserService extends RESTDataSource {
@@ -25,16 +30,8 @@ class UserService extends RESTDataSource {
     });
   }
 
-  getUserById(id: string): Promise<void> {
-    return this.get(`${id}`);
-  }
-
-  protected verifyToken(token: string): Promise<void> {
-    return this.post(`verify`, null, {
-      headers: {
-        Authorization: `Jwt ${token}`,
-      },
-    });
+  async getUserById(id: string): Promise<void | User> {
+    return transformObject(await this.get(`${id}`));
   }
 }
 

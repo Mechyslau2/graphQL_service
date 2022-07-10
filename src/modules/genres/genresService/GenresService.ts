@@ -1,20 +1,31 @@
-import { RESTDataSource } from "apollo-datasource-rest";
+import { RequestOptions, RESTDataSource } from "apollo-datasource-rest";
 import "dotenv/config";
+import { transformData, transformObject } from "../../../utils/sortUtils.js";
 
-interface GenreCreate {
+ interface GenreCreate {
   name: string;
   description: string;
   country: string;
   year: string;
 }
 
+interface GenreData {
+  items: Genre[];
+  total: number;
+  limit: number;
+  offset: number;
+}
 interface IParams {
   limit: number;
   offset: number;
 }
 
-interface Genre extends GenreCreate {
+export interface Genre extends GenreCreate {
   _id: string;
+}
+
+interface UpdateGenre {
+  id: string;
 }
 
 class GenresService extends RESTDataSource {
@@ -23,36 +34,31 @@ class GenresService extends RESTDataSource {
     this.baseURL = process.env.GENRES_URL;
   }
 
-  createGenre(genre: GenreCreate, token: string): Promise<void> {
-    return this.post(this.baseURL, genre, {
-      headers: {
-        Authorization: `jwt ${token}`,
-      },
-    });
+  protected willSendRequest(request: RequestOptions): void | Promise<void> {
+    request.headers.set("Authorization", `JWT ${this.context.AUTH_TOKEN}`);
   }
 
-  updateGenre(id: string, genre: Genre, token: string): Promise<void> {
-    return this.put(`${this.baseURL}/${id}`, genre, {
-      headers: {
-        Authorization: `jwt ${token}`,
-      },
-    });
+  async createGenre(genre: GenreCreate): Promise<void> {
+    return transformObject<Genre>(await this.post(this.baseURL, genre));
   }
 
-  deleteGenre(id: string, token: string): Promise<void> {
-    return this.delete(`${id}`, null, {
-      headers: {
-        Authorization: `jwt ${token}`,
-      },
-    });
+  updateGenre(id: string, genre: UpdateGenre): Promise<void> {
+    return this.put(`${id}`, { ...genre });
   }
 
-  getAllGenres(params: IParams): Promise<void> {
-    return this.get(this.baseURL, { ...params });
+  deleteGenre(id: string): Promise<void> {
+    return this.delete(`${id}`);
+  } 
+
+  async getAllGenres(params?: IParams): Promise<any | GenreData> {
+    const response = await this.get(this.baseURL, { ...params });
+    const transformItems = await transformData<Genre>(response.items);
+    response.items = transformItems;
+    return response;
   }
 
-  getGenreById(id: string): Promise<void> {
-    return this.get(`${id}`);
+  async getGenreById(id: string): Promise<void | Genre> {
+    return transformObject<Genre>(await this.get(`${id}`));
   }
 }
 

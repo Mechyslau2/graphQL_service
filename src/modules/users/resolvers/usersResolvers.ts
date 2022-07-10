@@ -3,7 +3,6 @@ export default  {
   Query: {
     jwt: async(_, { email, password }, { dataSources }) => {
       const token = await dataSources.userApi.login(email, password);
-      await dataSources.userApi.verifyToken(token.jwt);
       process.env.AUTH = token.jwt;
       return token;
     },
